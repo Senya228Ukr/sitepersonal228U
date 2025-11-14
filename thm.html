@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8"/>
+    <title>THM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!-- Те же стили, что и на index.html -->
+    <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="global.css"/>
+</head>
+<body>
+<div class="container">
+    <p>In this page are represented all my achievements in TryHackMe</p>
+
+    <div class="header">
+        <h1><a href="https://tryhackme.com/p/karsenij456">TryHackMe</a></h1>
+    </div>
+
+    <nav class="nav">
+        <a href="index.html">home</a>
+        <ul id="feed"></ul>
+    </nav>
+
+    <div class="grid cols-2" id="list"></div>
+</div>
+
+<script>
+(function(){
+  const KEY = 'posts:thm';
+  const root = document.getElementById('list');
+
+  function render(){
+    if (!root) { return; }
+
+    root.innerHTML = '';
+    let arr = [];
+    try { arr = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e) { arr = []; }
+
+    if (arr.length === 0) {
+      const p = document.createElement('p');
+      p.textContent = 'Пока нет записей.';
+      root.appendChild(p);
+      return;
+    }
+
+    for (const item of arr) {
+      const card = document.createElement('div');
+      card.className = 'card reveal';
+
+      const head = document.createElement('div');
+      head.className = 'card-header';
+      head.textContent = item.title || '';
+      card.appendChild(head);
+
+      const body = document.createElement('div');
+      body.className = 'card-content';
+
+      if (item.image) {
+        const img = document.createElement('img');
+        img.src = item.image;
+        img.alt = item.title || '';
+        img.style.maxWidth = '100%';
+        img.style.height = 'auto';
+        body.appendChild(img);
+      } else if (item.body) {
+        body.textContent = item.body;
+      } else {
+        body.textContent = '';
+      }
+
+      card.appendChild(body);
+      root.appendChild(card);
+    }
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

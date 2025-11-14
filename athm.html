@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<title>Добавить комнату</title>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="assets/styles.css" rel="stylesheet"/>
+<link href="../assets/css/global.css" rel="stylesheet"/></head>
+<body>
+<div class="container">
+<div class="header"><h1>addroom</h1></div>
+<nav class="nav">
+<a href="index.html">home</a>
+<a href="thm.html">sertificates</a>
+</nav>
+<form id="form">
+<label>image
+        <input accept="image/*" id="file" required="" type="file"/>
+</label>
+<label>caption
+        <input id="caption" maxlength="200" placeholder="назва кімнати" type="text"/>
+</label>
+<button disabled="" id="publishBtn" type="submit">publish</button>
+</form>
+<ul aria-live="polite" id="feed"></ul>
+</div>
+<script>
+    const STORAGE_KEY = 'photoPosts';
+
+    const form = document.getElementById('form');
+    const fileInput = document.getElementById('file');
+    const captionInput = document.getElementById('caption');
+    const publishBtn = document.getElementById('publishBtn');
+    const feed = document.getElementById('feed');
+
+    function loadPosts() { (JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')).forEach(addPostToPage); }
+    function savePosts(posts) { localStorage.setItem(STORAGE_KEY, JSON.stringify(posts)); }
+
+    function addPostToPage(post) {
+      const li = document.createElement('li');
+      li.className = 'card enter';
+
+      const figure = document.createElement('figure');
+      const img = document.createElement('img');
+      img.className = 'post';
+      const cap = document.createElement('figcaption');
+      const actions = document.createElement('div');
+      const del = document.createElement('button');
+
+      img.src = post.src;
+      img.alt = post.caption || 'image';
+      cap.textContent = post.caption || 'no caption';
+
+      del.textContent = 'delete';
+      del.className = 'deleteBtn';
+      del.addEventListener('click', () => {
+        li.classList.add('exit');
+        li.addEventListener('animationend', () => li.remove(), { once: true });
+        const nxt = (JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')).filter(p => p.id !== post.id);
+        savePosts(nxt);
+      });
+
+      actions.className = 'actions';
+      actions.appendChild(del);
+      figure.appendChild(img);
+      figure.appendChild(cap);
+      li.appendChild(figure);
+      li.appendChild(actions);
+      feed.prepend(li);
+      li.addEventListener('animationend', () => li.classList.remove('enter'), { once: true });
+    }
+
+    loadPosts();
+
+    fileInput.addEventListener('change', () => { publishBtn.disabled = !fileInput.files.length; });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = fileInput.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const post = { id: Date.now().toString(36) + Math.random().toString(36).slice(2), src: ev.target.result, caption: captionInput.value.trim() };
+        addPostToPage(post);
+        const list = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        list.push(post);
+        savePosts(list);
+        form.reset();
+        publishBtn.disabled = true;
+      };
+      reader.readAsDataURL(f);
+    });
+  </script>
+</body>
+</html>
