@@ -2,21 +2,21 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8"/>
-    <title>Добавить сертификат</title>
+    <title>Добавить HackTheBox публикацию</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <!-- Общие стили из корня репозитория -->
+    <!-- Общие стили -->
     <link rel="stylesheet" href="styles.css"/>
     <link rel="stylesheet" href="global.css"/>
 </head>
 <body>
 <div class="container">
-    <h1>Добавить hb</h1>
+    <h1>Добавить HackTheBox публикацию</h1>
 
     <form class="card" id="postForm">
         <div class="card-content">
             <input id="title" placeholder="Заголовок" required="true" />
-            <textarea id="body" placeholder="Текст" rows="6"></textarea>
+            <input id="image" type="file" accept="image/*" required="true" />
             <button class="btn-primary shimmer glow" type="submit">Сохранить</button>
             <a class="btn-ghost" href="hb.html">К списку</a>
         </div>
@@ -25,38 +25,52 @@
 
 <script>
 (function(){
-  const KEY = 'posts:sertificates';
-  const f = document.getElementById('postForm');
+  const KEY = 'posts:hb';
+  const form = document.getElementById('postForm');
+  const titleInput = document.getElementById('title');
+  const imageInput = document.getElementById('image');
 
-  if (!f) { return; }
+  if (!form) { return; }
 
-  f.addEventListener('submit', e => {
+  form.addEventListener('submit', function(e){
     e.preventDefault();
 
-    const t = document.getElementById('title').value.trim();
-    const b = (document.getElementById('body').value || '').trim();
+    const t = (titleInput.value || '').trim();
+    const file = imageInput.files[0];
 
     if (!t) {
       alert('Введите заголовок');
       return;
     }
-
-    let arr = [];
-    try {
-      arr = JSON.parse(localStorage.getItem(KEY) || '[]');
-    } catch(e) {
-      arr = [];
+    if (!file) {
+      alert('Выберите изображение');
+      return;
     }
 
-    arr.unshift({
-      id: Date.now(),
-      title: t,
-      body: b,
-      createdAt: new Date().toISOString()
-    });
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const dataUrl = ev.target.result;
+      let arr;
+      try {
+        arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+      } catch (e) {
+        arr = [];
+      }
+      arr.unshift({
+        id: Date.now(),
+        title: t,
+        image: dataUrl,
+        createdAt: new Date().toISOString()
+      });
+      localStorage.setItem(KEY, JSON.stringify(arr));
+      window.location.href = 'hb.html';
+    };
 
-    localStorage.setItem(KEY, JSON.stringify(arr));
-    window.location.href = 'hb.html';
+    reader.onerror = function(){
+      alert('Не удалось прочитать файл изображения');
+    };
+
+    reader.readAsDataURL(file);
   });
 })();
 </script>

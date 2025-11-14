@@ -2,10 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8"/>
-    <title>HB</title>
+    <title>HackTheBox</title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <!-- Те же стили, что и на index.html -->
+    <!-- Общие стили -->
     <link rel="stylesheet" href="styles.css"/>
     <link rel="stylesheet" href="global.css"/>
 </head>
@@ -14,11 +14,12 @@
     <p>In this page are represented all my achievements in HackTheBox</p>
 
     <div class="header">
-        <h1><a href="https://tryhackme.com/p/karsenij456">HackTheBox</a></h1>
+        <h1><a href="https://app.hackthebox.com/">HackTheBox</a></h1>
     </div>
 
     <nav class="nav">
         <a href="index.html">home</a>
+        <a class="btn-primary shimmer glow" href="addhb.html">Добавить публикацию</a>
         <ul id="feed"></ul>
     </nav>
 
@@ -27,7 +28,7 @@
 
 <script>
 (function(){
-  const KEY = 'posts:thm';
+  const KEY = 'posts:hb';
   const root = document.getElementById('list');
 
   function render(){
@@ -35,7 +36,11 @@
 
     root.innerHTML = '';
     let arr = [];
-    try { arr = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e) { arr = []; }
+    try {
+      arr = JSON.parse(localStorage.getItem(KEY) || '[]');
+    } catch(e) {
+      arr = [];
+    }
 
     if (arr.length === 0) {
       const p = document.createElement('p');
